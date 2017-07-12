@@ -3,16 +3,16 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# @Author 
+# @Author
 # Giacomo Dabisias, PhD Student
 # PERCRO, (Laboratory of Perceptual Robotics)
 # Scuola Superiore Sant'Anna
@@ -21,7 +21,7 @@
 cmake_minimum_required(VERSION 2.8)
 Project(kinect2grabber CXX)
 
-set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -std=c++11") 
+set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_BUILD_TYPE  Release)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
@@ -73,14 +73,19 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${FREENECT2_INCLUDE_DIRS})
 include_directories(${INCLUDE})
 
-add_executable(Kinect2Grabber      test.cpp)
-add_executable(MultiKinect2Grabber multi_test.cpp)
+#add_executable(Kinect2Grabber_convert   test_convert.cpp)
+add_executable(Kinect2Grabber_raw   test_raw.cpp)
+#add_executable(Kinect2Grabber_pc    test_pc.cpp)
+#add_executable(Kinect2Grabber_vid   test_vid.cpp)
+#add_executable(MultiKinect2Grabber multi_test.cpp)
 
-target_link_libraries(Kinect2Grabber      ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
-target_link_libraries(MultiKinect2Grabber ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
+#target_link_libraries(Kinect2Grabber_convert   ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
+target_link_libraries(Kinect2Grabber_raw   ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
+#target_link_libraries(Kinect2Grabber_pc    ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
+#target_link_libraries(Kinect2Grabber_vid   ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
+#target_link_libraries(MultiKinect2Grabber ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
 
 if(${WITH_ROS})
 	add_executable(RosKinect2Grabber test_ros.cpp)
 	target_link_libraries(RosKinect2Grabber ${catkin_LIBRARIES} ${OpenCV_LIBS} ${FREENECT2_LIBRARY} ${PCL_LIBRARIES} ${BOOST_LIBS})
 endif()
-
