@@ -28,6 +28,7 @@ via Luigi Alamanni 13D, San Giuliano Terme 56010 (PI), Italy
 #ifdef WITH_PCL
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+//#include <pcl/io/pcd_io.h>
 #endif
 #include <opencv2/opencv.hpp>
 #include <signal.h>
@@ -396,16 +397,17 @@ public:
 	}
 
 	// Depth and color are aligned and registered
-	void store_raw(const bool full_hd = true, const bool remove_points = false){
+	void store_raw(){
 
 		listener_.waitForNewFrame(frames_);
 		libfreenect2::Frame * rgb = frames_[libfreenect2::Frame::Color];
 		libfreenect2::Frame * depth = frames_[libfreenect2::Frame::Depth];
 
+		///*
 		cv::Mat depth_mat(depth->height, depth->width, CV_32FC1, depth->data);
 		cv::Mat color_mat(rgb->height, rgb->width, CV_8UC4, rgb->data);
 
-		std::chrono::high_resolution_clock::time_point p = std::chrono::high_resolution_clock::now();
+		std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
 		std::string time_stamp = std::to_string((long)std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count());
 
 		std::string file_path = "out/raw_depth/depth_" + time_stamp + ".bin";
@@ -415,7 +417,7 @@ public:
 		fclose (fp_depth);
 
 		cv::imwrite("out/hd/color_" + time_stamp + ".png", color_mat);
-
+		//*/
 		listener_.release(frames_);
 	}
 
@@ -504,6 +506,26 @@ public:
 		}
 
 		cloud = getCloud(rgb, depth, cloud);
+
+		/*
+		cv::Mat depth_temp(depth->height, depth->width, CV_32FC1, depth->data);
+		cv::Mat color_temp(rgb->height, rgb->width, CV_8UC4, rgb->data);
+
+		std::chrono::high_resolution_clock::time_point p = std::chrono::high_resolution_clock::now();
+		std::string time_stamp = std::to_string((long)std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count());
+
+		std::string file_path = "out/raw_depth/depth_" + time_stamp + ".bin";
+		FILE * fp_depth;
+		fp_depth = std::fopen(file_path.c_str(), "wb");
+		fwrite(depth_temp.data, depth_temp.elemSize(), depth_temp.rows * depth_temp.cols, fp_depth);
+		fclose (fp_depth);
+
+		cv::imwrite("out/hd/color_" + time_stamp + ".png", color_temp);
+
+		pcl::PCDWriter writer_pcd;
+		writer_pcd.write ("out/pc_pcd/cloud_" + time_stamp + ".pcd", *cloud, false);
+		*/
+
 		listener_.release(frames_);
 	}
 #endif

@@ -49,10 +49,10 @@ int main(int argc, char * argv[])
   boost::shared_ptr<cv::Mat> color_ptr;
   K2G k2g(freenectprocessor);
 
-  color = cv::imread("out/hd/color_76741510.png");
+  color = cv::imread("test/color.png");
   cv::cvtColor(color, color, CV_BGR2BGRA);
   // Read depth image
-  std::string file_path = "out/raw_depth/depth_76741510.bin";
+  std::string file_path = "test/depth.bin";
   FILE * fp_depth;
   fp_depth = std::fopen(file_path.c_str(), "rb");
   unsigned char *depthBuf[512*424*4];
@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
   k2g.getCloud(&rgb, &depth, cloud);
 
   pcl::PCDWriter writer_pcd;
-  writer_pcd.write ("out/pc_pcd/cloud_.pcd", *cloud, false);
+  writer_pcd.write ("test/cloud.pcd", *cloud, true);
 
 
   k2g.shutDown();

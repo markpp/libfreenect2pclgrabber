@@ -36,22 +36,22 @@ int main(int argc, char * argv[])
       freenectprocessor = static_cast<Processor>(atoi(argv[1]));
   }
 
-  namedWindow("Capturing", cv::WINDOW_AUTOSIZE);// Create a window for display.
+  namedWindow("Capturing, press 'Q' to stop", cv::WINDOW_AUTOSIZE);// Create a window for display.
 
   cv::Mat color, raw_depth, raw_ir;
   boost::shared_ptr<cv::Mat> color_ptr;
   K2G k2g(freenectprocessor);
-
+  k2g.disableLog();
   while(1)
   {
     std::chrono::high_resolution_clock::time_point tnow = std::chrono::high_resolution_clock::now();
 
-    k2g.store_raw(true);
+    k2g.store_raw();
 
     std::chrono::high_resolution_clock::time_point tpost = std::chrono::high_resolution_clock::now();
-    std::cout << std::chrono::duration_cast<std::chrono::duration<double>>(tpost-tnow).count() << std::endl;
+    std::cout << std::chrono::duration_cast<std::chrono::duration<double>>(tpost-tnow).count() << " ms" <<  std::endl;
 
-    int key = cv::waitKey(20);
+    int key = cv::waitKey(1);
     if (key=='q')
     {
       break;

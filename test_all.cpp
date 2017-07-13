@@ -70,11 +70,41 @@ void KeyboardEventOccurred(const pcl::visualization::KeyboardEvent &event, void 
   {
     if(pressed == "s")
     {
+      pcl::PLYWriter writer_ply;
       pcl::PCDWriter writer_pcd;
       std::chrono::high_resolution_clock::time_point p = std::chrono::high_resolution_clock::now();
       std::string now = std::to_string((long)std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count());
       writer_pcd.write ("out/pc_pcd/cloud_" + now + ".pcd", *(s->cloud_), s->use_camera_);
+      writer_ply.write("out/pc_ply/cloud_" + now + ".ply", *(s->cloud_), s->binary_, s->use_camera_);
       cv::imwrite("out/hd/color_" + now + ".png", *(s->color_));
+
+      ofstream ir_out;
+      ir_out.open("out/raw_ir/ir_" + now + ".dat");
+      for (int i = 0; i < s->raw_ir_->rows; ++i) {
+        unsigned short* rowPtr = (unsigned short*)s->raw_ir_->ptr(i);
+        for (int j = 0; j < s->raw_ir_->cols; ++j)
+          ir_out << rowPtr[j] << " ";
+        ir_out << endl;
+      }
+      ir_out.close();
+
+      cv::Mat ir;
+      s->raw_ir_->convertTo(ir, CV_8U, 255.0 / 65000);
+      cv::imwrite("out/ir/ir_" + now + ".png", ir);
+
+      ofstream depth_out;
+      depth_out.open("out/raw_depth/depth_" + now + ".dat");
+      for (int i = 0; i < s->raw_depth_->rows; ++i) {
+        unsigned short* rowPtr = (unsigned short*)s->raw_depth_->ptr(i);
+        for (int j = 0; j < s->raw_depth_->cols; ++j)
+          depth_out << rowPtr[j] << " ";
+        depth_out << endl;
+      }
+      depth_out.close();
+
+      cv::Mat depth;
+      s->raw_depth_->convertTo(depth, CV_8U, 255.0 / MAX_DEPTH);
+      cv::imwrite("out/depth/depth_" + now + ".png", depth);
 
       std::cout << "!!saved " << "data " + now + "!!" << std::endl;
       std::cout << "==========================" << std::endl;
@@ -146,8 +176,6 @@ int main(int argc, char * argv[])
   PlySaver ps(&color, &raw_depth, &raw_ir, cloud, false, false, k2g);
   viewer->registerKeyboardCallback(KeyboardEventOccurred, (void*)&ps);
 
-  pcl::PCDWriter writer_pcd;
-
   while(!viewer->wasStopped()){
 
     std::chrono::high_resolution_clock::time_point tnow = std::chrono::high_resolution_clock::now();
@@ -158,13 +186,6 @@ int main(int argc, char * argv[])
     //k2g.getIr(raw_ir);
 
     k2g.get(color, raw_depth, cloud, true);
-
-    std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
-    std::string time_stamp = std::to_string((long)std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count());
-
-    writer_pcd.write ("out/pc_pcd/cloud_" + time_stamp + ".pcd", *cloud, true);
-
-    cv::imwrite("out/hd/color_" + time_stamp + ".png", color);
 
     pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
 
